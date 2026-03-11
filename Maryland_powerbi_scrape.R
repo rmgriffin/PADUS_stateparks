@@ -243,8 +243,10 @@ panel_ann_sum<-panel %>%
   summarise(totvisits = sum(visitors)) %>% 
   drop_na()
 
-write.csv(panel_wide, "MD_wide.csv", row.names=FALSE)
-write.csv(panel_ann_sum, "MD_ann_sum.csv", row.names=FALSE)
+if (dir.exists("Out")) unlink("Out", recursive = TRUE, force = TRUE) # Deletes output folder
+dir.create("Out")
+write.csv(panel_wide, "Out/MD_wide.csv", row.names=FALSE)
+write.csv(panel_ann_sum, "Out/MD_ann_sum.csv", row.names=FALSE)
 
 print(nrow(panel))
 print(head(panel))
