@@ -1,8 +1,24 @@
-library(httr)
-library(jsonlite)
-library(stringr)
-library(purrr)
-library(dplyr)
+# Setup -------------------------------------------------------------------
+rm(list=ls()) # Clears workspace
+
+# # Install/call libraries
+# install.packages("renv") # Run if you have cloned repository and don't already have renv installed
+# renv::restore() # Run once after cloning repository
+# renv::install("package") # Run to install new packages
+# renv::snapshot() # Run after installing new packages (need to be referenced in code to get written - run renv::snapshot(type = "all") to avoid this)
+# renv::init() # Only run when the repository is first created, don't run on cloning an existing repository
+
+# Data for this repository is at https://drive.google.com/file/d/1UiExxgfnedtRNp76G2G7-sPGcHTkZguD/view?usp=sharing
+
+# Checks that required packages are installed, stops if not, loads them if they are
+pkgs<-c("tidyverse","sf","httr","jsonlite")
+missing<-pkgs[!vapply(pkgs, requireNamespace, logical(1), quietly=TRUE)]
+if (length(missing)>0) {
+  stop("Missing packages: ", paste(missing, collapse=", "),
+       "\nRun renv::restore()")
+}
+invisible(lapply(pkgs, library, character.only=TRUE))
+rm(pkgs, missing)
 
 # ----------------------------
 # 0) CONFIG
