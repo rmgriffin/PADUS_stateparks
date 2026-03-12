@@ -87,6 +87,10 @@ parse_pdf<-function(file){
 }
 
 visitation_df<-map_dfr(pdf_files, parse_pdf)
+visitation_df$park<-stringr::str_replace_all(visitation_df$park, "–", "-") # Deals with formatting of dashes
+visitation_df$date_begin<-paste0("1/1/",visitation_df$year)
+visitation_df$date_end<-paste0("12/31/",visitation_df$year)
+visitation_df$year<-NULL
 
 if (dir.exists("Out")) unlink("Out", recursive = TRUE, force = TRUE) # Deletes output folder
 dir.create("Out")
