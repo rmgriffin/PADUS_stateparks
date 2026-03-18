@@ -11,7 +11,7 @@ rm(list=ls()) # Clears workspace
 # Data for this repository is at https://drive.google.com/file/d/1UiExxgfnedtRNp76G2G7-sPGcHTkZguD/view?usp=sharing
 
 # Checks that required packages are installed, stops if not, loads them if they are
-pkgs<-c("tidyverse","sf")
+pkgs<-c("tidyverse","sf","googlesheets4","fuzzyjoin")
 missing<-pkgs[!vapply(pkgs, requireNamespace, logical(1), quietly=TRUE)]
 if (length(missing)>0) {
   stop("Missing packages: ", paste(missing, collapse=", "),
@@ -22,6 +22,14 @@ rm(pkgs, missing)
 
 
 # Download and load data --------------------------------------------------
+gs4_deauth()
+ann_visits<-read_sheet(
+  "https://docs.google.com/spreadsheets/d/1Sjxj21f7JpXsawPMPXvXV51qR1KLzj8StdHDqBOoi-E",
+  sheet="Annual")
+mon_visits<-read_sheet(
+  "https://docs.google.com/spreadsheets/d/1Sjxj21f7JpXsawPMPXvXV51qR1KLzj8StdHDqBOoi-E",
+  sheet="Monthly")
+
 # Download national PADUS database here https://www.sciencebase.gov/catalog/item/652d4fc5d34e44db0e2ee45e and unzip and put in Data folder
 
 # st_layers("Data/PADUS4_1Geodatabase.gdb/") # Inspect layers
@@ -41,3 +49,21 @@ padus_s %>%
   select(Unit_Nm) %>% 
   distinct() %>% 
   print(n = Inf)
+
+
+# Matching site names -----------------------------------------------------
+sites1<-ann_visits|>
+  distinct(State, Park) %>% 
+  rename(State_Nm = State, Unit_Nm = Park)
+
+sites2<-padus_s|>
+  as.data.frame()|>
+  distinct(State_Nm, Unit_Nm)
+
+candidates<-stringdist_inner_join( # Fuzzy matching on names
+  sites1, sites2,
+  by=c("State_Nm","Unit_Nm"),
+  method="jw",
+  max_dist=0.25,   # loose on purpose
+  distance_col="dist"
+)
