@@ -44,7 +44,7 @@ padus<-st_read( # Load combined layer
 padus_s<-padus %>% 
   filter(Des_Tp %in% c("SP","SW","SCA","SREC","SHCA","SRMA","SOTH"))
 
-padus_s %>% 
+padus_s %>% # Parks are often broken up into multiple pieces if they have distinct information associated with them
   filter(State_Nm == "AL" & Des_Tp == "SP") %>% 
   select(Unit_Nm) %>% 
   distinct() %>% 
@@ -418,4 +418,23 @@ source("all_resolved_final.R")
 # 
 # writeLines(lines, "all_resolved.R")
 
+
+# Merges ------------------------------------------------------------------
+all_resolved<-all_resolved %>% # Filtering non-matched park data
+  filter(!is.na(best_match))
+
+visits_mapped<-ann_visits %>%
+  inner_join(
+    all_resolved,
+    by=c("State"="State_Nm.x", "Park"="Unit_Nm.x")
+  )
+
+final<-padus_s %>%
+  inner_join(
+    visits_mapped,
+    by=c("State_Nm"="State", "Unit_Nm"="best_match"),
+    relationship="many-to-many"
+  )
+
+st_write(final,"Out/annual_visits_PADUS_v1.gpkg")
 
