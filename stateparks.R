@@ -423,7 +423,7 @@ source("all_resolved_final.R")
 all_resolved<-all_resolved %>% # Filtering non-matched park data
   filter(!is.na(best_match))
 
-visits_mapped<-ann_visits %>%
+visits_mapped<-ann_visits %>% # Annual
   inner_join(
     all_resolved,
     by=c("State"="State_Nm.x", "Park"="Unit_Nm.x")
@@ -437,4 +437,21 @@ final<-padus_s %>%
   )
 
 st_write(final,"Out/annual_visits_PADUS_v1.gpkg")
+
+visits_mapped_mon<-mon_visits %>% # Annual
+  inner_join(
+    all_resolved,
+    by=c("State"="State_Nm.x", "Park Name"="Unit_Nm.x")
+  )
+
+final_mon<-padus_s %>%
+  inner_join(
+    visits_mapped_mon,
+    by=c("State_Nm"="State", "Unit_Nm"="best_match"),
+    relationship="many-to-many"
+  )
+
+st_write(final_mon,"Out/monthly_visits_PADUS_v1.gpkg")
+
+
 
