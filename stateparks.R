@@ -454,4 +454,9 @@ final_mon<-padus_s %>%
 st_write(final_mon,"Out/monthly_visits_PADUS_v1.gpkg")
 
 
+# Subsetting -------------------------------------------------------------
+# df<-st_read("Out/annual_visits_PADUS_v1.gpkg")
+# CA<-df |> 
+#   filter(State_Nm == "CA")
+# st_write(CA,"Out/annual_visits_PADUS_v1_CA.gpkg")
 
